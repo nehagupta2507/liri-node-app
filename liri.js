@@ -87,7 +87,7 @@ let question = [{
     {
         type: "input",
         name: "movieName",
-        message: `What's the name of the movie you would like?`,
+        message: "Please type the movie you would like to search?",
         when: function(options) {
             return options.functions == "Movie";
         }
@@ -95,7 +95,7 @@ let question = [{
     {
         type: "input",
         name: "songName",
-        message: `What"s the name of the song you would like?`,
+        message: "Please type the movie you would like to search?",
         when: function(options) {
             return options.functions == "Spotify";
         }
