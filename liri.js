@@ -5,13 +5,31 @@ var Spotify = require("node-spotify-api");
 var spotify = new Spotify(keys.spotify);
 var axios = require("axios");
 var inquirer = require("inquirer");
+var moment = require('moment');
 let dashes = "========================================================";
 let searchResult ="============================================================== YOUR SEARCH RESULTS: ======================================================================================";
 
 //Concert Bands in Town
-function callBands(concert){
-    console.log("Callling concert");
-}
+function callBands(artistName){
+    if (!artistName) {
+        artistName = "Shawn Mendes";
+    }
+    let queryURL = "https://rest.bandsintown.com/artists/" + artistName + "/events?app_id=codingbootcamp";
+    axios.get(queryURL).then(function(response){
+        let res = response.data[0];
+        result = searchResult + "\n"
+        + "Name of the venue: "+ res.venue.name + "\n" 
+        + "Venue location: " + res.venue.city + "\n"
+        + "Date and time of the Event: " + moment(res.datetime).format("LLL") + "\n"
+        + dashes + dashes + dashes + "\n";
+        console.log(result);    
+    })
+    .catch(function(error) {
+        if (error.response) {
+          console.log(error);
+        } 
+      });
+};
 //Spotify api
 function callSpotify(songName) {
     // default song is `old town road`
@@ -20,12 +38,12 @@ function callSpotify(songName) {
     }
     spotify.search({ type: "track", query: songName }, function(error, data) {
         if (error) {
-            return console.log('Error occurred: ' + error);
+            return console.log("Error occurred: " + error);
         }
         let res = data.tracks.items;
-        console.log(res[0]);
         let songsMatch = [];
-        for (let i=0; i < data.tracks.items.length; i++){
+        console.log(data.tracks.items);
+        for (let i=0; i < data.tracks.items[0].length; i++){
             if (data.tracks.items[i].name == songName){
 	    	    songsMatch.push(i);
 	    	}
@@ -34,12 +52,11 @@ function callSpotify(songName) {
         if (songsMatch.length > 0){
             console.log(searchResult + "\n")
             for (let i=0; i <songsMatch.length; i++){
-            result = 
-            "Song: " + res[songsMatch[i]].name + "\n"	
+            result = "Song: " + res[songsMatch[i]].name + "\n"	
 			+ "Artist: " + res[songsMatch[i]].artists[0].name + "\n"
 			+ "Album: " + res[songsMatch[i]].album.name + "\n"
             + "Spotify link: " + res[songsMatch[i]].external_urls.spotify + "\n"
-            + dashes 
+            + dashes + dashes + dashes + "\n";
             console.log(result);
             }
 		}
@@ -56,7 +73,6 @@ let callOMDB = function(movieName) {
 
     axios.get(queryURL).then(function(response){
         let res = response.data;
-        // console.log(res.Title + res.Year);
         result = searchResult + "\n"
         + "Title of the movie: "+ res.Title + "\n" 
         + "Year the movie came out: " + res.Year + "\n"
@@ -66,28 +82,11 @@ let callOMDB = function(movieName) {
         + "Language of the movie: " + res.Language + "\n"
         + "Plot of the movie: "+ res.Plot + "\n"
         + "Actors in the movie: "+ res.Actors + "\n"
-        +dashes + dashes + dashes + "\n"
+        +dashes + dashes + dashes + "\n";
         console.log(result);
     })
     .catch(function(error) {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.log("---------------Data---------------");
-          console.log(error.response.data);
-          console.log("---------------Status---------------");
-          console.log(error.response.status);
-          console.log("---------------Status---------------");
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an object that comes back with details pertaining to the error that occurred.
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
+        console.log("Error occurred: "+ error);
       });
 };
 
@@ -110,7 +109,7 @@ let question = [{
     {
         type: "input",
         name: "concert",
-        message: "Please type the concert name you would like to search?",
+        message: "Please type the concert/artist name you would like to search?",
         when: function(options) {
             return options.function == "Concert";
         }
@@ -138,7 +137,7 @@ inquirer
     .then(options => {
         switch (options.function) {
             case "Concert":
-                callBands(options.song);
+                callBands(options.concert);
                 break;
             case "Spotify":
                 callSpotify(options.song);
