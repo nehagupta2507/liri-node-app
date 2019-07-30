@@ -8,6 +8,10 @@ var inquirer = require("inquirer");
 let dashes = "========================================================";
 let searchResult ="============================================================== YOUR SEARCH RESULTS: ======================================================================================";
 
+//Concert Bands in Town
+function callBands(concert){
+    console.log("Callling concert");
+}
 //Spotify api
 function callSpotify(songName) {
     // default song is `old town road`
@@ -16,11 +20,29 @@ function callSpotify(songName) {
     }
     spotify.search({ type: "track", query: songName }, function(error, data) {
         if (error) {
-            console.log("Error occurred: " + error);
-            return;
-        } else {
-            console.log(JSON.stringify(data));
+            return console.log('Error occurred: ' + error);
         }
+        let res = data.tracks.items;
+        console.log(res[0]);
+        let songsMatch = [];
+        for (let i=0; i < data.tracks.items.length; i++){
+            if (data.tracks.items[i].name == songName){
+	    	    songsMatch.push(i);
+	    	}
+        }
+        console.log(songsMatch.length + " songs found that match your query.");
+        if (songsMatch.length > 0){
+            console.log(searchResult + "\n")
+            for (let i=0; i <songsMatch.length; i++){
+            result = 
+            "Song: " + res[songsMatch[i]].name + "\n"	
+			+ "Artist: " + res[songsMatch[i]].artists[0].name + "\n"
+			+ "Album: " + res[songsMatch[i]].album.name + "\n"
+            + "Spotify link: " + res[songsMatch[i]].external_urls.spotify + "\n"
+            + dashes 
+            console.log(result);
+            }
+		}
     });
 
 }
@@ -75,29 +97,38 @@ function doWhatItSays() {
             return console.log(error);
           }
         callSpotify(data);
+
     });
 }
 
 let question = [{
         type: "list",
-        name: "functions",
+        name: "function",
         message: "Please make a selection from below:-",
-        choices: ["Spotify", "Movie","Do what it says"]
+        choices: ["Concert","Spotify", "Movie","Do what it says"]
     },
     {
         type: "input",
-        name: "movieName",
-        message: "Please type the movie you would like to search?",
+        name: "concert",
+        message: "Please type the concert name you would like to search?",
         when: function(options) {
-            return options.functions == "Movie";
+            return options.function == "Concert";
         }
     },
     {
         type: "input",
-        name: "songName",
+        name: "movie",
         message: "Please type the movie you would like to search?",
         when: function(options) {
-            return options.functions == "Spotify";
+            return options.function == "Movie";
+        }
+    },
+    {
+        type: "input",
+        name: "song",
+        message: "Please type the song  name you would like to search?",
+        when: function(options) {
+            return options.function == "Spotify";
         }
     },
 ];
@@ -105,17 +136,20 @@ let question = [{
 inquirer
     .prompt(question)
     .then(options => {
-        switch (options.functions) {
+        switch (options.function) {
+            case "Concert":
+                callBands(options.song);
+                break;
             case "Spotify":
-                callSpotify(options.songName);
+                callSpotify(options.song);
                 break;
             case "Movie":
-                callOMDB(options.movieName);
+                callOMDB(options.movie);
                 break;
             case "Do what it says":
                 doWhatItSays();
                 break;
             default:
-                console.log(`LIRI doesn"t know that`);
+                console.log("INVALID REQUEST. PLEASE RETRY!");
         }
     });
