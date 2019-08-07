@@ -22,7 +22,8 @@ function callBands(artistName){
         + "Venue location: " + res.venue.city + "\n"
         + "Date and time of the Event: " + moment(res.datetime).format("LLL") + "\n"
         + dashes + dashes + dashes + "\n";
-        console.log(result);    
+        console.log(result); 
+        writeFile(result);
     })
     .catch(function(error) {
         if (error.response) {
@@ -40,29 +41,19 @@ function callSpotify(songName) {
         if (error) {
             return console.log("Error occurred: " + error);
         }
-        let res = data.tracks.items;
-        let songsMatch = [];
-        console.log(data.tracks.items);
-        for (let i=0; i < data.tracks.items[0].length; i++){
-            if (data.tracks.items[i].name == songName){
-	    	    songsMatch.push(i);
-	    	}
-        }
-        console.log(songsMatch.length + " songs found that match your query.");
-        if (songsMatch.length > 0){
-            console.log(searchResult + "\n")
-            for (let i=0; i <songsMatch.length; i++){
-            result = "Song: " + res[songsMatch[i]].name + "\n"	
-			+ "Artist: " + res[songsMatch[i]].artists[0].name + "\n"
-			+ "Album: " + res[songsMatch[i]].album.name + "\n"
-            + "Spotify link: " + res[songsMatch[i]].external_urls.spotify + "\n"
+        let res = data.tracks.items[0];
+            result = searchResult + "\n"
+            + "Song: " + res.name + "\n"	
+			+ "Artist: " + res.artists[0].name + "\n"
+			+ "Album: " + res.album.name + "\n"
+            + "Spotify link: " + res.external_urls.spotify + "\n"
+            + "Preview URL: " + res.preview_url
             + dashes + dashes + dashes + "\n";
             console.log(result);
-            }
-		}
+            writeFile(result);
     });
-
 }
+
 //Movie API OMDB
 let callOMDB = function(movieName) {
 
@@ -84,6 +75,8 @@ let callOMDB = function(movieName) {
         + "Actors in the movie: "+ res.Actors + "\n"
         +dashes + dashes + dashes + "\n";
         console.log(result);
+        writeFile(result);
+
     })
     .catch(function(error) {
         console.log("Error occurred: "+ error);
@@ -96,10 +89,16 @@ function doWhatItSays() {
             return console.log(error);
           }
         callSpotify(data);
-
     });
 }
 
+// Function to log data in File
+function writeFile(data){
+    fs.appendFile("log.txt", data, "utf8",function(error){
+        if (error) throw error;
+            console.log("log.txt was updated!");
+    })
+}
 let question = [{
         type: "list",
         name: "function",

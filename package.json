@@ -23,6 +23,7 @@
     "inquirer": "^6.5.0",
     "link-preview-node": "^1.0.3",
     "moment": "^2.24.0",
-    "node-spotify-api": "^1.1.1"
+    "node-spotify-api": "^1.1.1",
+    "preview-link": "^2.0.1"
   }
 }
