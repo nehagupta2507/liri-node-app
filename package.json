@@ -22,7 +22,7 @@
     "dotenv": "^8.0.0",
     "inquirer": "^6.5.0",
     "link-preview-node": "^1.0.3",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "node-spotify-api": "^1.1.1",
     "preview-link": "^2.0.1"
   }
